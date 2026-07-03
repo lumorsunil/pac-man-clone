@@ -63,7 +63,7 @@ pub const Game = struct {
     }
 
     pub fn pixelSize(_: @This()) Vector {
-        return .init(320, 256);
+        return .init(224, 288);
     }
 
     pub fn addSingleton(self: *@This(), singleton: anytype) void {
@@ -172,5 +172,14 @@ pub const Game = struct {
 
     pub fn random(self: *@This()) std.Random {
         return self.random_io.interface();
+    }
+
+    pub fn hitbox(_: *@This(), ctx: EntityContext) rl.Rectangle {
+        const body = ctx.getConst(Game.C.Body);
+        const renderable = ctx.getConst(Game.C.Renderable);
+        const size = renderable.size(0);
+        const position = body.position;
+
+        return .init(position.x, position.y, size.x, size.y);
     }
 };

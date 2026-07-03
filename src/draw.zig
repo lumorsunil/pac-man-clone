@@ -1,13 +1,17 @@
 const std = @import("std");
 const Game = @import("game.zig").Game;
 const rl = @import("raylib");
+const Maze = @import("maze.zig").Maze;
 
 const enable_debug_draw = true;
 
 pub fn draw(self: *Game) void {
     rl.clearBackground(.black);
     self.camera().begin();
+
+    drawMaze(self);
     drawRenderables(self);
+
     self.camera().end();
     rl.drawFPS(8, 8);
 
@@ -46,5 +50,16 @@ fn drawRenderables(self: *Game) void {
         const renderable = ctx.get(Game.C.Renderable);
 
         renderable.draw(body.position, body.rotation);
+    }
+}
+
+fn drawMaze(self: *Game) void {
+    const texture = self.getSingleton(rl.Texture2D);
+    for (Maze.maze_layout, 0..) |source, i| {
+        const sprite = Game.C.Renderable.initSprite(texture.*, source);
+        const x: f32 = @floatFromInt(i % Maze.maze_width);
+        const y: f32 = @floatFromInt(@divFloor(i, Maze.maze_width));
+        const position = Game.Vector.init(x, y).scale(Maze.cell_size);
+        sprite.draw(position, 0);
     }
 }
